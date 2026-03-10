@@ -51,7 +51,11 @@ def download():
     return Response(generate(), headers={"Content-Disposition":f'attachment; filename="{safe_name}"', "Content-Type":"video/mp4"})
 
 @app.route("/", methods=["GET"])
-def health(): return jsonify({"status":"ok","message":"VidShare API running"})
+def health():
+    try:
+        return open("index.html").read(), 200, {"Content-Type": "text/html"}
+    except:
+        return jsonify({"status":"ok","message":"VidShare API running"})
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT",8080)))
