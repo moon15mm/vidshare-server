@@ -4,63 +4,104 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VidShare</title>
-<script>
-const API_URL = "https://web-production-6447.up.railway.app";
-
-async function analyze() {
-  const url = document.getElementById('url').value.trim();
-  if (!url) return alert('ادخل رابط');
-  document.getElementById('status').textContent = 'جاري التحليل...';
-  try {
-    const r = await fetch(API_URL+'/analyze', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({url})});
-    const d = await r.json();
-    if (d.error) { document.getElementById('status').textContent = '❌ '+d.error; return; }
-    document.getElementById('status').textContent = '✅ '+d.title;
-    document.getElementById('info').style.display='block';
-    document.getElementById('title').textContent = d.title;
-    document.getElementById('platform').textContent = d.platform + ' - ' + d.duration;
-    const qs = document.getElementById('qualities');
-    qs.innerHTML = '';
-    (d.qualities||[]).forEach(q => {
-      const o = document.createElement('option');
-      o.value = q.id; o.textContent = q.label; qs.appendChild(o);
-    });
-    window._url = url;
-  } catch(e) { document.getElementById('status').textContent = '❌ فشل الاتصال'; }
-}
-
-async function download() {
-  if (!window._url) return;
-  document.getElementById('status').textContent = 'جاري التحميل...';
-  const fmt = document.getElementById('qualities').value;
-  try {
-    const r = await fetch(API_URL+'/download', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({url:window._url, format_id:fmt})});
-    const blob = await r.blob();
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-    a.download = 'video.mp4'; a.click();
-    document.getElementById('status').textContent = '✅ تم التحميل!';
-  } catch(e) { document.getElementById('status').textContent = '❌ فشل التحميل'; }
-}
-</script>
 <style>
-body{font-family:Arial;background:#0a0a1a;color:#fff;padding:20px;direction:rtl}
-input{width:100%;padding:12px;border-radius:8px;border:none;margin:10px 0;font-size:16px}
-button{background:#7c3aed;color:#fff;border:none;padding:12px 24px;border-radius:8px;font-size:16px;cursor:pointer;margin:5px}
-select{width:100%;padding:10px;border-radius:8px;margin:10px 0;font-size:16px}
-#info{display:none;background:#1a1a2e;padding:15px;border-radius:10px;margin:15px 0}
-h1{color:#7c3aed}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial;background:#0a0a1a;color:#fff;padding:20px;min-height:100vh}
+h1{color:#a78bfa;text-align:center;margin-bottom:24px;font-size:1.8rem}
+.card{background:#1a1a2e;border-radius:14px;padding:20px;margin-bottom:16px}
+input{width:100%;padding:14px;border-radius:10px;border:2px solid #333;background:#0a0a1a;color:#fff;font-size:15px;margin-bottom:12px}
+input:focus{border-color:#7c3aed;outline:none}
+.btn{width:100%;padding:14px;border:none;border-radius:10px;font-size:16px;font-weight:bold;cursor:pointer;margin-bottom:10px}
+.btn-analyze{background:#7c3aed;color:#fff}
+.btn-download{background:#06d6a0;color:#000;display:none}
+select{width:100%;padding:12px;border-radius:10px;border:2px solid #333;background:#0a0a1a;color:#fff;font-size:15px;margin-bottom:12px;display:none}
+.status{text-align:center;padding:10px;border-radius:8px;margin-bottom:10px;display:none}
+.status.loading{background:#1e1e3a;color:#a78bfa}
+.status.success{background:#0d2e1f;color:#06d6a0}
+.status.error{background:#2e0d0d;color:#f87171}
+.info{display:none}
+.info-row{display:flex;justify-content:space-between;margin-bottom:8px;font-size:14px;color:#888}
+.info-val{color:#fff;font-weight:bold}
 </style>
 </head>
 <body>
 <h1>🎬 VidShare</h1>
-<input id="url" placeholder="الصق رابط الفيديو هنا..." />
-<button onclick="analyze()">🔍 تحليل</button>
-<p id="status"></p>
-<div id="info">
-  <p id="title"></p>
-  <p id="platform"></p>
-  <select id="qualities"></select>
-  <button onclick="download()">⬇️ تحميل</button>
+
+<div class="card">
+  <input id="url" type="url" placeholder="الصق رابط الفيديو هنا..." />
+  <button class="btn btn-analyze" onclick="analyze()">🔍 تحليل الرابط</button>
 </div>
+
+<div class="status" id="status"></div>
+
+<div class="card info" id="info">
+  <div class="info-row"><span>العنوان</span><span class="info-val" id="vtitle"></span></div>
+  <div class="info-row"><span>المنصة</span><span class="info-val" id="vplatform"></span></div>
+  <div class="info-row"><span>المدة</span><span class="info-val" id="vduration"></span></div>
+  <select id="qualities"></select>
+  <button class="btn btn-download" id="btnDl" onclick="download()">⬇️ تحميل الفيديو</button>
+</div>
+
+<script>
+const API = "https://web-production-6447.up.railway.app";
+let savedUrl = "";
+
+function showStatus(msg, type) {
+  const s = document.getElementById("status");
+  s.textContent = msg; s.className = "status " + type; s.style.display = "block";
+}
+
+async function analyze() {
+  const url = document.getElementById("url").value.trim();
+  if (!url) { showStatus("⚠️ الرجاء إدخال رابط", "error"); return; }
+  savedUrl = url;
+  showStatus("⏳ جاري تحليل الرابط...", "loading");
+  document.getElementById("info").style.display = "none";
+  document.getElementById("btnDl").style.display = "none";
+  document.getElementById("qualities").style.display = "none";
+
+  try {
+    const r = await fetch(API + "/analyze", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({url})
+    });
+    const d = await r.json();
+    if (d.error) { showStatus("❌ " + d.error, "error"); return; }
+
+    document.getElementById("vtitle").textContent = d.title || "-";
+    document.getElementById("vplatform").textContent = d.platform || "-";
+    document.getElementById("vduration").textContent = d.duration || "-";
+
+    const qs = document.getElementById("qualities");
+    qs.innerHTML = "";
+    (d.qualities || []).forEach(q => {
+      const o = document.createElement("option");
+      o.value = q.id; o.textContent = q.label; qs.appendChild(o);
+    });
+
+    document.getElementById("info").style.display = "block";
+    if (d.qualities && d.qualities.length > 0) qs.style.display = "block";
+    document.getElementById("btnDl").style.display = "block";
+    showStatus("✅ تم تحليل الفيديو بنجاح!", "success");
+  } catch(e) {
+    showStatus("❌ فشل الاتصال بالسيرفر", "error");
+  }
+}
+
+function download() {
+  const fmt = document.getElementById("qualities").value || "";
+  // Open download in new tab — works best on mobile
+  const form = document.createElement("form");
+  form.method = "POST";
+  form.action = API + "/download";
+  form.target = "_blank";
+  form.style.display = "none";
+  
+  // Use a direct link approach instead
+  const dlUrl = API + "/dl?url=" + encodeURIComponent(savedUrl) + "&fmt=" + encodeURIComponent(fmt);
+  window.open(dlUrl, "_blank");
+}
+</script>
 </body>
 </html>
