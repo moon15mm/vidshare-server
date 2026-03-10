@@ -43,12 +43,8 @@ def download():
         matches = glob.glob("/tmp/vidshare_*")
         if not matches: return jsonify({"error":"الملف غير موجود"}), 500
         filepath = max(matches, key=os.path.getctime)
-    safe_name = re.sub(r"[^\w\-_. ]","_", os.path.basename(filepath))
-    def generate():
-        with open(filepath,"rb") as f:
-            while chunk := f.read(1024*1024): yield chunk
-        os.remove(filepath)
-    return Response(generate(), headers={"Content-Disposition":f'attachment; filename="{safe_name}"', "Content-Type":"video/mp4"})
+    from flask import send_file
+    return send_file(filepath, mimetype="video/mp4", as_attachment=True, download_name="video.mp4")
 
 @app.route("/", methods=["GET"])
 def health():
