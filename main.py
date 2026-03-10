@@ -53,5 +53,21 @@ def health():
     except:
         return jsonify({"status":"ok","message":"VidShare API running"})
 
+
+@app.route("/dl", methods=["GET"])
+def dl():
+    url = request.args.get("url","").strip()
+    fmt = request.args.get("fmt","") or "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"
+    if not url: return jsonify({"error":"missing url"}), 400
+    result = run_ytdlp(["-f",fmt,"--merge-output-format","mp4","--no-playlist","-o","/tmp/vidshare_%(id)s.%(ext)s","--print","filename",url])
+    if not result: return jsonify({"error":"download failed"}), 500
+    filepath = result.stdout.strip().split("\n")[-1]
+    if not os.path.exists(filepath):
+        matches = glob.glob("/tmp/vidshare_*")
+        if not matches: return jsonify({"error":"file not found"}), 500
+        filepath = max(matches, key=os.path.getctime)
+    from flask import send_file
+    return send_file(filepath, mimetype="video/mp4", as_attachment=True, download_name="video.mp4")
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT",8080)))
