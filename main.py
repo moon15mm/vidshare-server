@@ -68,5 +68,15 @@ def index():
             return open(p).read(), 200, {"Content-Type":"text/html"}
     return jsonify({"status":"ok"})
 
+
+@app.route("/debug", methods=["GET"])
+def debug():
+    import subprocess
+    url = request.args.get("url","https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+    r = subprocess.run(["yt-dlp","--version"], capture_output=True, text=True)
+    ver = r.stdout.strip()
+    r2 = subprocess.run(["yt-dlp","--dump-json","--no-playlist",url], capture_output=True, text=True, timeout=60)
+    return jsonify({"yt_dlp_version":ver,"returncode":r2.returncode,"stdout":r2.stdout[:500],"stderr":r2.stderr[:1000]})
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT",8080)))
