@@ -3,6 +3,7 @@ RUN apt-get update && apt-get install -y ffmpeg && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install -r requirements.txt
+RUN pip install -U yt-dlp
 COPY . .
 EXPOSE 8080
-CMD ["python", "main.py"]
+CMD ["sh","-c","pip install -U yt-dlp && python main.py"]
