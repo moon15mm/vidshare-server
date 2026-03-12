@@ -2,106 +2,155 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>VidShare</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
+:root{--bg:#07090f;--c1:#0e1220;--c2:#141926;--b:rgba(255,255,255,0.07);--a:#6c63ff;--g:#00e5a0;--p:#ff4d8d;--t:#eef0f8;--m:#4a5270}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Arial;background:#0a0a1a;color:#fff;padding:20px;min-height:100vh}
-h1{color:#a78bfa;text-align:center;margin-bottom:24px;font-size:1.8rem}
-.card{background:#1a1a2e;border-radius:14px;padding:20px;margin-bottom:16px}
-input{width:100%;padding:14px;border-radius:10px;border:2px solid #333;background:#0a0a1a;color:#fff;font-size:15px;margin-bottom:12px}
-input:focus{border-color:#7c3aed;outline:none}
-.btn{width:100%;padding:14px;border:none;border-radius:10px;font-size:16px;font-weight:bold;cursor:pointer;margin-bottom:10px}
-.btn-analyze{background:#7c3aed;color:#fff}
-.btn-download{background:#06d6a0;color:#000;display:none}
-select{width:100%;padding:12px;border-radius:10px;border:2px solid #333;background:#0a0a1a;color:#fff;font-size:15px;margin-bottom:12px;display:none}
-.status{text-align:center;padding:10px;border-radius:8px;margin-bottom:10px;display:none}
-.status.loading{background:#1e1e3a;color:#a78bfa}
-.status.success{background:#0d2e1f;color:#06d6a0}
-.status.error{background:#2e0d0d;color:#f87171}
-.info{display:none}
-.info-row{display:flex;justify-content:space-between;margin-bottom:8px;font-size:14px;color:#888}
-.info-val{color:#fff;font-weight:bold}
-</style>
-</head>
-<body>
-<h1>🎬 VidShare</h1>
-
-<div class="card">
-  <input id="url" type="url" placeholder="الصق رابط الفيديو هنا..." />
-  <button class="btn btn-analyze" onclick="analyze()">🔍 تحليل الرابط</button>
+body{font-family:"Cairo",sans-serif;background:var(--bg);color:var(--t);min-height:100vh}
+.orb{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0}
+.o1{width:500px;height:500px;background:rgba(108,99,255,.18);top:-150px;right:-120px;animation:fl 9s ease-in-out infinite}
+.o2{width:400px;height:400px;background:rgba(0,229,160,.12);bottom:-100px;left:-80px;animation:fl 12s ease-in-out infinite reverse}
+@keyframes fl{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
+.w{position:relative;z-index:1;max-width:480px;margin:0 auto;padding:16px 14px 50px}
+header{text-align:center;padding:30px 0 22px}
+.logo{font-size:2.4rem;font-weight:900;letter-spacing:-1px}
+.lv{color:var(--a)}.ls{color:var(--g)}
+.tag{color:var(--m);font-size:.8rem;margin-top:5px}
+.sec{font-size:.7rem;color:var(--m);font-weight:700;text-align:center;letter-spacing:.1em;margin-bottom:9px}
+.pls{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-bottom:22px}
+.pl{display:flex;align-items:center;gap:5px;background:var(--c1);border:1px solid var(--b);border-radius:30px;padding:6px 13px;font-size:.73rem;font-weight:700;transition:all .2s}
+.pl svg{width:14px;height:14px;flex-shrink:0}
+.card{background:var(--c1);border:1px solid var(--b);border-radius:18px;padding:18px;margin-bottom:12px;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+.ct{font-size:.72rem;font-weight:700;color:var(--m);margin-bottom:10px}
+.ir{display:flex;background:var(--c2);border:1.5px solid var(--b);border-radius:12px;overflow:hidden;transition:border-color .2s}
+.ir:focus-within{border-color:var(--a)}
+.ir input{flex:1;background:none;border:none;outline:none;color:var(--t);font-family:"Cairo",sans-serif;font-size:.87rem;padding:12px 14px;direction:ltr;text-align:left}
+.ir input::placeholder{color:var(--m);font-size:.78rem}
+.btngo{background:linear-gradient(135deg,var(--a),#9b8fff);border:none;color:#fff;padding:10px 16px;font-family:"Cairo",sans-serif;font-weight:700;font-size:.8rem;cursor:pointer;display:flex;align-items:center;gap:5px}
+.spin{display:none;width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pb{height:3px;background:var(--c2);border-radius:3px;margin-top:10px;overflow:hidden;display:none}
+.pf{height:100%;width:0%;background:linear-gradient(90deg,var(--a),var(--g));transition:width .4s ease}
+.st{border-radius:10px;padding:10px 14px;font-size:.8rem;font-weight:700;text-align:center;display:none;margin-bottom:12px}
+.sload{background:rgba(108,99,255,.12);color:#9b8fff;border:1px solid rgba(108,99,255,.25)}
+.sok{background:rgba(0,229,160,.1);color:var(--g);border:1px solid rgba(0,229,160,.25)}
+.serr{background:rgba(255,77,141,.1);color:var(--p);border:1px solid rgba(255,77,141,.25)}
+.res{display:none;animation:up .35s ease}
+@keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.tr{display:flex;gap:12px;align-items:flex-start;margin-bottom:16px}
+.th{width:90px;height:60px;border-radius:10px;background:var(--c2);display:flex;align-items:center;justify-content:center;font-size:1.8rem;flex-shrink:0;overflow:hidden}
+.th img{width:100%;height:100%;object-fit:cover;border-radius:10px}
+.vi{flex:1;min-width:0}
+.vt{font-weight:700;font-size:.88rem;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.vm{color:var(--m);font-size:.71rem;margin-top:5px;display:flex;flex-wrap:wrap;gap:6px}
+.qs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:15px}
+.qc{background:var(--c2);border:1.5px solid var(--b);border-radius:8px;padding:6px 13px;font-size:.75rem;font-weight:700;cursor:pointer;transition:all .2s;color:var(--m)}
+.qc.on,.qc:hover{background:rgba(108,99,255,.15);border-color:var(--a);color:#9b8fff}
+.ac{display:flex;gap:9px}
+.btndl{flex:1;background:linear-gradient(135deg,var(--g),#00c48a);border:none;color:#041a0e;padding:13px;border-radius:12px;font-family:"Cairo",sans-serif;font-weight:900;font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.btndl:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(0,229,160,.28)}
+.btnsh{background:var(--c2);border:1.5px solid var(--b);color:var(--t);padding:13px 15px;border-radius:12px;font-family:"Cairo",sans-serif;font-weight:700;font-size:.87rem;cursor:pointer;display:flex;align-items:center;gap:5px}
+.btnsh:hover{border-color:var(--p);color:var(--p)}
+.shp{display:none;animation:up .3s ease}
+.sgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.si{background:var(--c2);border:1px solid var(--b);border-radius:14px;padding:13px 6px;text-align:center;cursor:pointer;transition:all .2s}
+.si:hover{transform:translateY(-2px);border-color:rgba(108,99,255,.5)}
+.si svg{width:26px;height:26px;margin-bottom:5px}
+.si span{display:block;font-size:.67rem;font-weight:700;color:var(--m)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:10px}
+.stat{background:var(--c1);border:1px solid var(--b);border-radius:14px;padding:14px;text-align:center}
+.sn{font-size:1.3rem;font-weight:900}.hi{color:var(--g)}
+.sk{font-size:.66rem;color:var(--m);margin-top:2px;font-weight:600}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--c1);border:1px solid var(--g);color:var(--g);padding:9px 22px;border-radius:30px;font-size:.8rem;font-weight:700;opacity:0;transition:all .3s;pointer-events:none;z-index:99}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+</style></head><body>
+<div class="orb o1"></div><div class="orb o2"></div>
+<div class="w">
+<header><div class="logo"><span class="lv">Vid</span><span class="ls">Share</span></div>
+<div class="tag">حمّل وشارك أي فيديو • مجاناً وبدون تسجيل</div></header>
+<div class="sec">✶ المنصات المدعومة</div>
+<div class="pls">
+<div class="pl" style="color:#ff4444"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 00-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.5A3 3 0 00.5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 002.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 002.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5z"/></svg>يوتيوب</div>
+<div class="pl" style="color:#ff2d78"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.6 0h-3.9v16.3a3.5 3.5 0 01-3.5 3.4 3.5 3.5 0 01-3.5-3.4 3.5 3.5 0 013.5-3.5c.3 0 .7 0 1 .1V8.9a7.4 7.4 0 00-1-.1A7.4 7.4 0 004.8 16.3 7.4 7.4 0 0012.2 24a7.4 7.4 0 007.4-7.7V7.8a11.6 11.6 0 006.8 2.2V6.2A7.5 7.5 0 0119.6 0z"/></svg>تيك توك</div>
+<div class="pl" style="color:#f77737"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C8.7 0 8.3 0 7.1.1 2.7.3.3 2.7.1 7.1 0 8.3 0 8.7 0 12c0 3.3 0 3.7.1 4.9.2 4.4 2.6 6.8 7 7C8.3 24 8.7 24 12 24c3.3 0 3.7 0 4.9-.1 4.4-.2 6.8-2.6 7-7 .1-1.2.1-1.6.1-4.9 0-3.3 0-3.7-.1-4.9-.2-4.4-2.6-6.8-7-7C15.7 0 15.3 0 12 0zm0 5.8a6.2 6.2 0 100 12.4A6.2 6.2 0 0012 5.8zm0 10.2a4 4 0 110-8 4 4 0 010 8zm6.4-11.8a1.4 1.4 0 100 2.8 1.4 1.4 0 000-2.8z"/></svg>انستغرام</div>
+<div class="pl" style="color:#fff"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.3 5.7l-4.8 5.5L19.5 18h-4.4l-3.1-4.1L8.3 18H5.7l5.1-5.9L5 5.7h4.5l2.8 3.7 3.5-3.7h2.5z"/></svg>تويتر</div>
+<div class="pl" style="color:#1877f2"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12a12 12 0 10-13.9 11.9v-8.4h-3V12h3V9.4c0-3 1.8-4.7 4.6-4.7l2.6.2v3h-1.5c-1.5 0-2 .9-2 1.9V12h3.4l-.5 3.5h-2.8V24A12 12 0 0024 12z"/></svg>فيسبوك</div>
+<div class="pl" style="color:#1d9bf0"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.6 0 12 0zm5.8 8.6l-1.8 8.4c-.1.6-.5.8-1 .4l-2.8-2.1-1.3 1.3c-.2.2-.4.3-.7.3l.2-3 5.4-4.9c.2-.2 0-.3-.4-.1L6.3 13.7 3.5 12.9c-.6-.2-.6-.6.2-.9l11.3-4.4c.6-.2 1.1.1.8.9z"/></svg>تيليغرام</div>
+<div class="pl" style="color:#25d366"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12c0 2.1.6 4.1 1.6 5.9L0 24l6.3-1.6A12 12 0 0012 24c6.6 0 12-5.4 12-12S18.6 0 12 0zm5.5 16.5c-.2.6-1.3 1.2-1.8 1.2-.4 0-.9.1-2.8-.6-2.4-.9-3.9-3.3-4-3.4-.2-.2-1.3-1.7-1.3-3.3s1-2.4 1.3-2.7c.3-.3.6-.4.8-.4h.6c.2 0 .5 0 .7.5.2.6.8 2.2.9 2.3.1.2.1.4 0 .5l-.4.5c-.1.2-.3.4-.1.6.1.3.7 1.3 1.6 2.1 1.1 1 2 1.4 2.4 1.5.3.1.5 0 .6-.1.2-.2.8-.9.9-1.1.2-.3.4-.2.7-.1.2.1 1.6.8 1.9.9.3.1.5.2.5.3.1.3 0 1-.3 1.7z"/></svg>واتساب</div>
+<div class="pl" style="color:#fffc00"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12c0 2.3.7 4.5 1.8 6.4-.1.4-.4 1.8-.8 3.3 0 .2 0 .4.2.5h.4c1.4-.3 2.9-.7 3.3-.8C6.5 22.5 9.2 24 12 24c6.6 0 12-5.4 12-12S18.6 0 12 0zm0 6c1.7 0 2 .7 2 1.6 0 1.1-.8 2.1-1.8 2.1h-.1c-.9 0-1.7-.9-1.7-2.1C10.3 6.7 10.7 6 12 6zm3 11H9c-.4 0-.7-.3-.7-.8 0-.1.1-.3.2-.4.6-.5 1.5-1.3 1.5-3.3 0-1.1.4-1.5 2-1.5s2 .4 2 1.5c0 2 .9 2.8 1.5 3.3.1.1.2.2.2.4 0 .4-.3.8-.7.8z"/></svg>سناب شات</div>
 </div>
-
-<div class="status" id="status"></div>
-
-<div class="card info" id="info">
-  <div class="info-row"><span>العنوان</span><span class="info-val" id="vtitle"></span></div>
-  <div class="info-row"><span>المنصة</span><span class="info-val" id="vplatform"></span></div>
-  <div class="info-row"><span>المدة</span><span class="info-val" id="vduration"></span></div>
-  <select id="qualities"></select>
-  <button class="btn btn-download" id="btnDl" onclick="download()">⬇️ تحميل الفيديو</button>
-</div>
-
+<div class="card"><div class="ct">🔗 الصق رابط الفيديو</div>
+<div class="ir"><input type="url" id="url" placeholder="https://www.youtube.com/watch?v=..."/>
+<button class="btngo" onclick="analyze()"><div class="spin" id="spin"></div><span id="bt">🔍 تحليل</span></button></div>
+<div class="pb" id="pb"><div class="pf" id="pf"></div></div></div>
+<div class="st" id="st"></div>
+<div class="card res" id="res">
+<div class="tr"><div class="th" id="th">🎬</div>
+<div class="vi"><div class="vt" id="vt"></div><div class="vm" id="vm"></div></div></div>
+<div class="ct">🎯 اختر الجودة</div>
+<div class="qs" id="qs"></div>
+<div class="ac">
+<button class="btndl" onclick="dl()">⬇️ تحميل الفيديو</button>
+<button class="btnsh" onclick="tsh()">↗️ مشاركة</button>
+</div></div>
+<div class="card shp" id="shp"><div class="ct">↗️ شارك على</div>
+<div class="sgrid">
+<div class="si" onclick="sh('wa')"><svg viewBox="0 0 24 24" fill="#25d366"><path d="M12 0C5.4 0 0 5.4 0 12c0 2.1.6 4.1 1.6 5.9L0 24l6.3-1.6A12 12 0 0012 24c6.6 0 12-5.4 12-12S18.6 0 12 0zm5.5 16.5c-.2.6-1.3 1.2-1.8 1.2-.4 0-.9.1-2.8-.6-2.4-.9-3.9-3.3-4-3.4-.2-.2-1.3-1.7-1.3-3.3s1-2.4 1.3-2.7c.3-.3.6-.4.8-.4h.6c.2 0 .5 0 .7.5.2.6.8 2.2.9 2.3.1.2.1.4 0 .5l-.4.5c-.1.2-.3.4-.1.6.1.3.7 1.3 1.6 2.1 1.1 1 2 1.4 2.4 1.5.3.1.5 0 .6-.1.2-.2.8-.9.9-1.1.2-.3.4-.2.7-.1.2.1 1.6.8 1.9.9.3.1.5.2.5.3.1.3 0 1-.3 1.7z"/></svg><span>واتساب</span></div>
+<div class="si" onclick="sh('tg')"><svg viewBox="0 0 24 24" fill="#1d9bf0"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.6 0 12 0zm5.8 8.6l-1.8 8.4c-.1.6-.5.8-1 .4l-2.8-2.1-1.3 1.3c-.2.2-.4.3-.7.3l.2-3 5.4-4.9c.2-.2 0-.3-.4-.1L6.3 13.7 3.5 12.9c-.6-.2-.6-.6.2-.9l11.3-4.4c.6-.2 1.1.1.8.9z"/></svg><span>تيليغرام</span></div>
+<div class="si" onclick="sh('tw')"><svg viewBox="0 0 24 24" fill="#fff"><path d="M18.3 5.7l-4.8 5.5L19.5 18h-4.4l-3.1-4.1L8.3 18H5.7l5.1-5.9L5 5.7h4.5l2.8 3.7 3.5-3.7h2.5z"/></svg><span>تويتر</span></div>
+<div class="si" onclick="sh('fb')"><svg viewBox="0 0 24 24" fill="#1877f2"><path d="M24 12a12 12 0 10-13.9 11.9v-8.4h-3V12h3V9.4c0-3 1.8-4.7 4.6-4.7l2.6.2v3h-1.5c-1.5 0-2 .9-2 1.9V12h3.4l-.5 3.5h-2.8V24A12 12 0 0024 12z"/></svg><span>فيسبوك</span></div>
+<div class="si" onclick="sh('ig')"><svg viewBox="0 0 24 24" fill="#f77737"><path d="M12 0C8.7 0 8.3 0 7.1.1 2.7.3.3 2.7.1 7.1 0 8.3 0 8.7 0 12c0 3.3 0 3.7.1 4.9.2 4.4 2.6 6.8 7 7C8.3 24 8.7 24 12 24c3.3 0 3.7 0 4.9-.1 4.4-.2 6.8-2.6 7-7 .1-1.2.1-1.6.1-4.9 0-3.3 0-3.7-.1-4.9-.2-4.4-2.6-6.8-7-7C15.7 0 15.3 0 12 0zm0 5.8a6.2 6.2 0 100 12.4A6.2 6.2 0 0012 5.8zm0 10.2a4 4 0 110-8 4 4 0 010 8zm6.4-11.8a1.4 1.4 0 100 2.8 1.4 1.4 0 000-2.8z"/></svg><span>انستغرام</span></div>
+<div class="si" onclick="sh('tt')"><svg viewBox="0 0 24 24" fill="#ff2d78"><path d="M19.6 0h-3.9v16.3a3.5 3.5 0 01-3.5 3.4 3.5 3.5 0 01-3.5-3.4 3.5 3.5 0 013.5-3.5c.3 0 .7 0 1 .1V8.9a7.4 7.4 0 00-1-.1A7.4 7.4 0 004.8 16.3 7.4 7.4 0 0012.2 24a7.4 7.4 0 007.4-7.7V7.8a11.6 11.6 0 006.8 2.2V6.2A7.5 7.5 0 0119.6 0z"/></svg><span>تيك توك</span></div>
+<div class="si" onclick="sh('yt')"><svg viewBox="0 0 24 24" fill="#ff4444"><path d="M23.5 6.2a3 3 0 00-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.5A3 3 0 00.5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 002.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 002.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.7 15.5V8.5l6.3 3.5z"/></svg><span>يوتيوب</span></div>
+<div class="si" onclick="sh('cp')"><svg viewBox="0 0 24 24" fill="#6c63ff"><path d="M16 1H4C3 1 2 2 2 3v14h2V3h12V1zm3 4H8C7 5 6 6 6 7v14c0 1 1 2 2 2h11c1 0 2-1 2-2V7c0-1-1-2-2-2zm0 16H8V7h11v14z"/></svg><span>نسخ الرابط</span></div>
+</div></div>
+<div class="stats">
+<div class="stat"><div class="sn"><span class="hi">1000</span>+</div><div class="sk">منصة مدعومة</div></div>
+<div class="stat"><div class="sn"><span class="hi">0</span></div><div class="sk">إعلانات</div></div>
+<div class="stat"><div class="sn"><span class="hi">4K</span></div><div class="sk">أعلى جودة</div></div>
+</div></div>
+<div class="toast" id="tst"></div>
 <script>
-const API = "https://web-production-6447.up.railway.app";
-let savedUrl = "";
-
-function showStatus(msg, type) {
-  const s = document.getElementById("status");
-  s.textContent = msg; s.className = "status " + type; s.style.display = "block";
+const API="https://web-production-6447.up.railway.app";
+let U="",F="",SV=false;
+function toast(m,d){const t=document.getElementById("tst");t.textContent=m;t.classList.add("on");clearTimeout(t._x);t._x=setTimeout(()=>t.classList.remove("on"),d||2800)}
+function ss(m,c){const s=document.getElementById("st");s.textContent=m;s.className="st "+c;s.style.display="block"}
+async function analyze(){
+const url=document.getElementById("url").value.trim();
+if(!url){toast("يرجى إدخال رابط");return}
+U=url;
+document.getElementById("spin").style.display="block";
+document.getElementById("bt").textContent="جاري...";
+document.getElementById("res").style.display="none";
+document.getElementById("shp").style.display="none";
+document.getElementById("pb").style.display="block";
+ss("جاري التحليل...","sload");
+let p=0;const iv=setInterval(()=>{p=Math.min(p+Math.random()*12+4,88);document.getElementById("pf").style.width=p+"%"},400);
+try{
+const r=await fetch(API+"/analyze",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url})});
+clearInterval(iv);document.getElementById("pf").style.width="100%";
+const d=await r.json();if(d.error)throw new Error(d.error);showRes(d);
+}catch(e){clearInterval(iv);ss("فشل: "+e.message,"serr")}
+finally{document.getElementById("spin").style.display="none";document.getElementById("bt").textContent="🔍 تحليل";setTimeout(()=>document.getElementById("pb").style.display="none",500)}
 }
-
-async function analyze() {
-  const url = document.getElementById("url").value.trim();
-  if (!url) { showStatus("⚠️ الرجاء إدخال رابط", "error"); return; }
-  savedUrl = url;
-  showStatus("⏳ جاري تحليل الرابط...", "loading");
-  document.getElementById("info").style.display = "none";
-  document.getElementById("btnDl").style.display = "none";
-  document.getElementById("qualities").style.display = "none";
-
-  try {
-    const r = await fetch(API + "/analyze", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({url})
-    });
-    const d = await r.json();
-    if (d.error) { showStatus("❌ " + d.error, "error"); return; }
-
-    document.getElementById("vtitle").textContent = d.title || "-";
-    document.getElementById("vplatform").textContent = d.platform || "-";
-    document.getElementById("vduration").textContent = d.duration || "-";
-
-    const qs = document.getElementById("qualities");
-    qs.innerHTML = "";
-    (d.qualities || []).forEach(q => {
-      const o = document.createElement("option");
-      o.value = q.id; o.textContent = q.label; qs.appendChild(o);
-    });
-
-    document.getElementById("info").style.display = "block";
-    if (d.qualities && d.qualities.length > 0) qs.style.display = "block";
-    document.getElementById("btnDl").style.display = "block";
-    showStatus("✅ تم تحليل الفيديو بنجاح!", "success");
-  } catch(e) {
-    showStatus("❌ فشل الاتصال بالسيرفر", "error");
-  }
+function showRes(d){
+ss("تم التحليل بنجاح!","sok");
+document.getElementById("vt").textContent=d.title||"...";
+document.getElementById("vm").innerHTML="<span>"+(d.duration||"-")+"</span><span>"+(d.platform||"-")+"</span>"+(d.uploader?"<span>"+d.uploader+"</span>":"");
+const th=document.getElementById("th");
+th.innerHTML=d.thumbnail?"<img src='"+d.thumbnail+"' onerror='this.parentElement.textContent=chr(0x1f3ac)'>":"🎬";
+const qs=document.getElementById("qs");qs.innerHTML="";
+(d.qualities||[]).forEach((q,i)=>{const c=document.createElement("div");c.className="qc"+(i===0?" on":"");c.textContent=q.label;c.onclick=()=>{document.querySelectorAll(".qc").forEach(x=>x.classList.remove("on"));c.classList.add("on");F=q.id};if(i===0)F=q.id;qs.appendChild(c)});
+document.getElementById("res").style.display="block";
 }
-
-function download() {
-  const fmt = document.getElementById("qualities").value || "";
-  // Open download in new tab — works best on mobile
-  const form = document.createElement("form");
-  form.method = "POST";
-  form.action = API + "/download";
-  form.target = "_blank";
-  form.style.display = "none";
-  
-  // Use a direct link approach instead
-  const dlUrl = API + "/dl?url=" + encodeURIComponent(savedUrl) + "&fmt=" + encodeURIComponent(fmt);
-  window.open(dlUrl, "_blank");
-}
-</script>
-</body>
-</html>
+function dl(){if(!U)return;window.open(API+"/dl?url="+encodeURIComponent(U)+"&fmt="+encodeURIComponent(F||""),"_blank");toast("جاري التحميل...",6000)}
+function tsh(){SV=!SV;document.getElementById("shp").style.display=SV?"block":"none"}
+function sh(p){
+const u=U||location.href;
+const m={wa:"https://wa.me/?text="+encodeURIComponent(u),tg:"https://t.me/share/url?url="+encodeURIComponent(u),tw:"https://twitter.com/intent/tweet?url="+encodeURIComponent(u),fb:"https://www.facebook.com/sharer/sharer.php?u="+encodeURIComponent(u)};
+if(p==="cp"){navigator.clipboard.writeText(u).then(()=>toast("تم نسخ الرابط!"))}
+else if(m[p])window.open(m[p],"_blank");
+else toast("افتح التطبيق وشارك يدوياً");}
+</script></body></html>
