@@ -4,23 +4,29 @@
   "description": "حمّل وشارك أي فيديو من أي منصة",
   "start_url": "/",
   "scope": "/",
-  "id": "vidshare-app",
   "display": "standalone",
   "background_color": "#07090f",
   "theme_color": "#6c63ff",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/icon.png",
+      "src": "https://raw.githubusercontent.com/moon15mm/vidshare-server/main/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icon-512.png",
+      "src": "https://raw.githubusercontent.com/moon15mm/vidshare-server/main/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "https://web-production-6447.up.railway.app",
+      "sizes": "540x720",
+      "type": "image/png"
     }
   ]
 }
