@@ -3,12 +3,30 @@
   "short_name": "VidShare",
   "description": "حمّل وشارك أي فيديو من أي منصة",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#07090f",
   "theme_color": "#6c63ff",
   "orientation": "portrait",
   "icons": [
-    {"src": "https://via.placeholder.com/192x192/6c63ff/ffffff?text=VS", "sizes": "192x192", "type": "image/png"},
-    {"src": "https://via.placeholder.com/512x512/6c63ff/ffffff?text=VS", "sizes": "512x512", "type": "image/png"}
+    {
+      "src": "https://raw.githubusercontent.com/moon15mm/vidshare-server/main/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://raw.githubusercontent.com/moon15mm/vidshare-server/main/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "https://web-production-6447.up.railway.app",
+      "sizes": "540x720",
+      "type": "image/png"
+    }
   ]
 }
