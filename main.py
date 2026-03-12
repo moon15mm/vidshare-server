@@ -78,5 +78,20 @@ def debug():
     r2 = subprocess.run(["yt-dlp","--dump-json","--no-playlist",url], capture_output=True, text=True, timeout=60)
     return jsonify({"yt_dlp_version":ver,"returncode":r2.returncode,"stdout":r2.stdout[:500],"stderr":r2.stderr[:1000]})
 
+
+@app.route("/manifest.json")
+def manifest():
+    for p in ["/app/manifest.json", "manifest.json"]:
+        if os.path.exists(p):
+            return open(p).read(), 200, {"Content-Type": "application/json"}
+    return "{}", 200
+
+@app.route("/sw.js")
+def sw():
+    for p in ["/app/sw.js", "sw.js"]:
+        if os.path.exists(p):
+            return open(p).read(), 200, {"Content-Type": "application/javascript"}
+    return "", 200
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT",8080)))
