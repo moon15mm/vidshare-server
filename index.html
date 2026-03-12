@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>VidShare</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#6c63ff">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#07090f;--c1:#0e1220;--c2:#141926;--b:rgba(255,255,255,0.07);--a:#6c63ff;--g:#00e5a0;--p:#ff4d8d;--t:#eef0f8;--m:#4a5270}
@@ -153,4 +155,5 @@ const m={wa:"https://wa.me/?text="+encodeURIComponent(u),tg:"https://t.me/share/
 if(p==="cp"){navigator.clipboard.writeText(u).then(()=>toast("تم نسخ الرابط!"))}
 else if(m[p])window.open(m[p],"_blank");
 else toast("افتح التطبيق وشارك يدوياً");}
+if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js')}
 </script></body></html>
