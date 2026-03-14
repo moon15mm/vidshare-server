@@ -47,7 +47,11 @@ def dl():
     if not result: return jsonify({"error":"download failed"}), 500
     matches = sorted(glob.glob("/tmp/vs_*"), key=os.path.getctime, reverse=True)
     if not matches: return jsonify({"error":"file not found"}), 500
-    return send_file(matches[0], mimetype="video/mp4", as_attachment=True, download_name="video.mp4")
+    fp=matches[0]
+    resp=send_file(fp,mimetype="video/mp4",as_attachment=True,download_name="video.mp4")
+    try: os.remove(fp)
+    except: pass
+    return resp
 
 @app.route("/download", methods=["POST"])
 def download():
@@ -59,7 +63,11 @@ def download():
     if not result: return jsonify({"error":"download failed"}), 500
     matches = sorted(glob.glob("/tmp/vs_*"), key=os.path.getctime, reverse=True)
     if not matches: return jsonify({"error":"file not found"}), 500
-    return send_file(matches[0], mimetype="video/mp4", as_attachment=True, download_name="video.mp4")
+    fp=matches[0]
+    resp=send_file(fp,mimetype="video/mp4",as_attachment=True,download_name="video.mp4")
+    try: os.remove(fp)
+    except: pass
+    return resp
 
 @app.route("/", methods=["GET"])
 def index():
